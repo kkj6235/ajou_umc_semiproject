@@ -1,7 +1,7 @@
 package umc.spring.board.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import umc.spring.board.Board;
+import umc.spring.board.domain.Board;
 
 import java.util.Optional;
 

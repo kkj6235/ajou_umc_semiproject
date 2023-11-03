@@ -1,9 +1,9 @@
-package umc.spring.board;
+package umc.spring.board.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import umc.spring.member.dto.Member;
+import umc.spring.member.domain.Member;
 
 import java.sql.Date;
 

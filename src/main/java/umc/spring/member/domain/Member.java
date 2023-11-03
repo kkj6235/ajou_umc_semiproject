@@ -1,4 +1,4 @@
-package umc.spring.member.dto;
+package umc.spring.member.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

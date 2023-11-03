@@ -4,7 +4,7 @@ package umc.spring.board.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import umc.spring.board.Board;
+import umc.spring.board.domain.Board;
 
 @Getter
 @Setter

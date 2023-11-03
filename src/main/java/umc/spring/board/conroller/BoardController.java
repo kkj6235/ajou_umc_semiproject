@@ -2,7 +2,7 @@ package umc.spring.board.conroller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import umc.spring.board.Board;
+import umc.spring.board.domain.Board;
 import umc.spring.board.dto.BoardRequestDto;
 import umc.spring.board.dto.BoardResponseDto;
 import umc.spring.board.repository.BoardRepository;
