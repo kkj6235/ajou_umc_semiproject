@@ -1,10 +1,10 @@
-package umc.spring.domain.board.dto;
+package umc.spring.board.dto;
 
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import umc.spring.domain.board.Board;
+import umc.spring.board.Board;
 
 @Getter
 @Setter
