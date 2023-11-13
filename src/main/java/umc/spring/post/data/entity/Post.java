@@ -1,10 +1,12 @@
-package com.umc.post.data.entity;
+package umc.spring.post.data.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "Post")
@@ -17,14 +19,31 @@ public class Post{
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private Long userId;
 
     @Column(nullable = false)
-    private String author;
+    private String title;
 
     @Column(nullable = false)
     private String body;
 
     @Column(nullable = false)
-    private Date timestamp;
+    private String image;
+
+    @Column(nullable = false)
+    private int likeCount;
+
+    @Column(nullable = false)
+    private String author;
+
+    @Column(nullable = true)
+    private Date createdTime;
+
+    @Column(nullable = true)
+    private Date modifiedTime;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,fetch = FetchType.EAGER,
+            orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
 }
