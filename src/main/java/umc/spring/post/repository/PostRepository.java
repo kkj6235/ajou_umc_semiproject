@@ -1,4 +1,4 @@
-package umc.spring.post.repository.repository;
+package umc.spring.post.repository;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
