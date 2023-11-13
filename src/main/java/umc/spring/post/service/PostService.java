@@ -1,29 +1,35 @@
-package umc.spring.post.service.service;
+package umc.spring.post.service;
 
 
+import jakarta.servlet.http.HttpServletResponse;
+import umc.spring.post.data.dto.CommentDto;
 import umc.spring.post.data.dto.PostDto;
+import umc.spring.post.data.dto.PostResDto;
 import umc.spring.post.data.entity.Post;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface PostService {
     void upload(PostDto postDto);
 
-    List<Post> getAllPost();
+    List<PostResDto> getAllPost();
 
-    Post getPostById(Long id);
+    PostResDto getPostById(Long id);
 
     void likeCrew(Long id);
 
     void dislikeCrew(Long id);
 
-    void deletePost(Long id);
+    boolean deletePost(Long id);
 
 
-    void editPost(PostDto postDto, Long id);
+    boolean editPost(PostDto postDto, Long id);
 
-    List<Post> search(String title);
+    List<PostResDto> search(String title);
 
 
-    void createComment(Long id);
+    void addComment(CommentDto commentDto);
+
+    boolean deleteComment(Long id);
 }
