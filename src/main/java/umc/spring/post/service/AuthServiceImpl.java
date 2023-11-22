@@ -23,6 +23,8 @@ import umc.spring.post.data.dto.UserJoinDto;
 import umc.spring.post.data.dto.UserLoginDto;
 import umc.spring.post.repository.UserRepository;
 
+import java.util.Optional;
+
 
 @Service
 public class AuthServiceImpl implements AuthService, UserDetailsService {
@@ -70,6 +72,9 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     @Override
     public UserInfoDto info() {
         UserInfoDto userInfoDto = SecurityUtil.getCurrentMemberId();
+        User user = userRepository.findByLoginId(userInfoDto.getLoginId()).orElseThrow();
+        userInfoDto.setUserName(user.getUsername());
+        userInfoDto.setId(user.getId());
         return userInfoDto;
     }
 

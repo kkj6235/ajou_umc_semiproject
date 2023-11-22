@@ -24,11 +24,6 @@ public class AuthController {
     public TokenInfo login(@RequestBody UserLoginDto userLoginDto) {
         return authService.login(userLoginDto);
     }
-
-    @PostMapping("/logout")
-    public TokenInfo logout(){
-        return null;
-    }
     @PostMapping("/register")
     public void register(@RequestBody UserJoinDto userJoinDto) {
         authService.join(userJoinDto);
