@@ -44,15 +44,15 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     @Override
     public TokenInfo login(UserLoginDto userLoginDto) {
-        User user = userRepository.findByUserId(userLoginDto.getUserId()).orElseThrow(() -> new UsernameNotFoundException("아이디 혹은 비밀번호를 확인하세요."));
+        User user = userRepository.findByLoginId(userLoginDto.getLoginId()).orElseThrow(() -> new UsernameNotFoundException("아이디 혹은 비밀번호를 확인하세요."));
 
         boolean matches = passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword());
         if (!matches) throw new BadCredentialsException("아이디 혹은 비밀번호를 확인하세요.");
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUserId(), user.getPassword(), user.getAuthorities());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getLoginId(), user.getPassword(), user.getAuthorities());
 
         TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
-        tokenInfo.setEmail(user.getUserId());
+        tokenInfo.setEmail(user.getLoginId());
 
         tokenInfo.setMemberRole(user.getRole().toString());
         return tokenInfo;
@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     @Override
     public void join(UserJoinDto userJoinDto) {
         User user = new User();
-        user.setUserId(userJoinDto.getUserId());
+        user.setLoginId(userJoinDto.getLoginId());
         user.setPassword(passwordEncoder.encode(userJoinDto.getPassword()));
         user.setUserName(userJoinDto.getUserName());
         userRepository.save(user);
@@ -75,7 +75,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        return userRepository.findByUserId(userId)
+        return userRepository.findByLoginId(userId)
                 .map(this::createUserDetails)
                 .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
     }
