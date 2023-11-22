@@ -35,7 +35,7 @@ public class PostResDto {
                 .author(post.getAuthor())
                 .body(post.getBody())
                 .image(post.getImage())
-                .likeCount(post.getLikeCount())
+                .likeCount(post.getLikes().size())
                 .createdTime(post.getCreatedTime())
                 .modifiedTime(post.getModifiedTime())
                 .comments(resDtos).build();

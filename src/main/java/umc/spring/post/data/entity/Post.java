@@ -46,6 +46,10 @@ public class Post{
             orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,fetch = FetchType.EAGER,
+            orphanRemoval = true)
+    private List<LikeData> likes = new ArrayList<>();
+
 
 
 }

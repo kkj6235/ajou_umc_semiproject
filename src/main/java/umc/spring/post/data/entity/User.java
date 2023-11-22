@@ -11,13 +11,14 @@ import umc.spring.post.config.security.Role;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 //@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Data
-@Table(name="user")
+@Table(name="User")
 public class User implements UserDetails {
 
     @Id
@@ -36,6 +37,10 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.EAGER,
+            orphanRemoval = true)
+    private List<LikeData> likes = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

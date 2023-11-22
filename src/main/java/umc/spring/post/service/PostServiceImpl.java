@@ -10,9 +10,11 @@ import umc.spring.post.data.dto.PostDto;
 import umc.spring.post.data.dto.PostResDto;
 import umc.spring.post.data.dto.UserInfoDto;
 import umc.spring.post.data.entity.Comment;
+import umc.spring.post.data.entity.LikeData;
 import umc.spring.post.data.entity.Post;
 import umc.spring.post.data.entity.User;
 import umc.spring.post.repository.CommentRepository;
+import umc.spring.post.repository.LikeRepository;
 import umc.spring.post.repository.PostRepository;
 import umc.spring.post.repository.UserRepository;
 
@@ -31,11 +33,14 @@ public class PostServiceImpl implements PostService{
 
     @Autowired
     private final UserRepository userRepository;
+    @Autowired
+    private final LikeRepository likeRepository;
 
-    public PostServiceImpl(PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository) {
+    public PostServiceImpl(PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository, LikeRepository likeRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.likeRepository = likeRepository;
     }
 
     @Override
@@ -120,24 +125,45 @@ public class PostServiceImpl implements PostService{
     @Override
     public void likeCrew(Long id) {
         UserInfoDto userInfoDto = getCurrentMemberId();
-
+        // 내가 좋아요를 누른적이 있는지? 있으면 반영안됨
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
-        int likeCount = post.getLikeCount();
-        post.setLikeCount(++likeCount);
-        postRepository.save(post);
+        User user = userRepository.findByLoginId(userInfoDto.getLoginId()).orElseThrow();
+        Optional<LikeData> byPostAndUser = likeRepository.findByPostAndUser(post, user);
+        if(byPostAndUser.isEmpty()){
+            LikeData likeData = new LikeData();
+            post.getLikes().add(likeData);
+            user.getLikes().add(likeData);
+            likeData.setUser(user);
+            likeData.setPost(post);
+            likeRepository.save(likeData);
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "이미 좋아요를 눌렀습니다.");
+        }
     }
 
     @Override
     public void dislikeCrew(Long id) {
+        UserInfoDto userInfoDto = getCurrentMemberId();
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
-        int likeCount = post.getLikeCount();
-        if(likeCount!=0){
-            post.setLikeCount(--likeCount);
+        User user = userRepository.findByLoginId(userInfoDto.getLoginId()).orElseThrow();
+        Optional<LikeData> byPostAndUser = likeRepository.findByPostAndUser(post, user);
+        if(byPostAndUser.isPresent()){
+            post.getLikes().removeIf(data ->
+                    data.getPost().equals(post)
+            );
             postRepository.save(post);
+
+            user.getLikes().removeIf(data ->
+                    data.getUser().equals(user)
+            );
+            userRepository.save(user);
         }
+        else{
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "좋아요를 누른 적이 없습니다");
+        }
+
     }
-
-
 
     @Override
     public List<PostResDto> search(String title) {
@@ -206,7 +232,7 @@ public class PostServiceImpl implements PostService{
     private static void setPost(PostDto postDto, Post post) {
         post.setTitle(postDto.getTitle());
         post.setBody(postDto.getBody());
-        post.setLikeCount(postDto.getLikeCount());
+        post.setLikeCount(0);
         post.setImage(postDto.getImage());
     }
 }
