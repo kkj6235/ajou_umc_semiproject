@@ -3,10 +3,15 @@ package umc.spring.post.service;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import umc.spring.post.config.security.SecurityUtil;
 import umc.spring.post.data.dto.CommentDto;
 import umc.spring.post.data.dto.PostDto;
 import umc.spring.post.data.dto.PostResDto;
+import umc.spring.post.data.dto.UserInfoDto;
 import umc.spring.post.data.entity.Comment;
 import umc.spring.post.data.entity.Post;
 import umc.spring.post.repository.CommentRepository;
@@ -32,6 +37,8 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void upload(PostDto postDto){
+        UserInfoDto userInfoDto = SecurityUtil.getCurrentMemberId();
+
         Post post = new Post();
         setPost(postDto, post);
         post.setUserId(postDto.getUserId());
@@ -54,13 +61,13 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public PostResDto getPostById(Long id){
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));;
         return PostResDto.toDTO(post);
     }
 
     @Override
     public void likeCrew(Long id) {
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         int likeCount = post.getLikeCount();
         post.setLikeCount(++likeCount);
         postRepository.save(post);
@@ -68,7 +75,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void dislikeCrew(Long id) {
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         int likeCount = post.getLikeCount();
         if(likeCount!=0){
             post.setLikeCount(--likeCount);
@@ -88,7 +95,7 @@ public class PostServiceImpl implements PostService{
     
     @Override
     public boolean editPost(PostDto postDto, Long id) {
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));;
         if(post!=null){
             post.setTitle(postDto.getTitle() != null ? postDto.getTitle() : post.getTitle());
             post.setBody(postDto.getBody() != null ? postDto.getBody() : post.getBody());
@@ -139,7 +146,8 @@ public class PostServiceImpl implements PostService{
 
     private Comment setComment(CommentDto commentDto) {
         Comment comment = new Comment();
-        Post post = postRepository.findById(commentDto.getPostId()).get();
+        Post post = postRepository.findById(commentDto.getPostId()).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
+
         post.getComments().add(comment);
         comment.setPost(post);
         comment.setUserId(commentDto.getUserId());
