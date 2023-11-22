@@ -8,9 +8,8 @@ import lombok.*;
 @ToString
 @Builder
 public class UserInfoDto {
-    private Long id;
+    private Long userId;
     private String userName;
     private String loginId;
     private String memberRole;
-
 }

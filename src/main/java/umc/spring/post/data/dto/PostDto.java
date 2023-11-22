@@ -6,9 +6,7 @@ import lombok.Setter;
 
 @Data
 public class PostDto {
-    Long userId;
     String title;
-    String author;
     String body;
     String image;
     int likeCount;

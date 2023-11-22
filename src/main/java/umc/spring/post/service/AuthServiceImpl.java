@@ -2,6 +2,7 @@ package umc.spring.post.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,15 +16,17 @@ import org.springframework.stereotype.Service;
 
 import umc.spring.post.data.entity.User;
 import umc.spring.post.config.security.JwtTokenProvider;
-import umc.spring.post.config.security.Role;
-import umc.spring.post.config.security.SecurityUtil;
 import umc.spring.post.config.security.TokenInfo;
 import umc.spring.post.data.dto.UserInfoDto;
 import umc.spring.post.data.dto.UserJoinDto;
 import umc.spring.post.data.dto.UserLoginDto;
 import umc.spring.post.repository.UserRepository;
 
-import java.util.Optional;
+
+import java.security.Principal;
+import java.util.Objects;
+
+import static umc.spring.post.config.security.SecurityUtil.getCurrentMemberId;
 
 
 @Service
@@ -52,11 +55,10 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         if (!matches) throw new BadCredentialsException("아이디 혹은 비밀번호를 확인하세요.");
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(user.getLoginId(), user.getPassword(), user.getAuthorities());
-
-        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+        TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication, user.getId(),user.getUsername());
         tokenInfo.setEmail(user.getLoginId());
-
         tokenInfo.setMemberRole(user.getRole().toString());
+
         return tokenInfo;
     }
 
@@ -71,12 +73,9 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     @Override
     public UserInfoDto info() {
-        UserInfoDto userInfoDto = SecurityUtil.getCurrentMemberId();
-        User user = userRepository.findByLoginId(userInfoDto.getLoginId()).orElseThrow();
-        userInfoDto.setUserName(user.getUsername());
-        userInfoDto.setId(user.getId());
-        return userInfoDto;
+        return getCurrentMemberId();
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {

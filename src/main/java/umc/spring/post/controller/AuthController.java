@@ -2,12 +2,18 @@ package umc.spring.post.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import umc.spring.post.config.security.TokenInfo;
 import umc.spring.post.data.dto.UserInfoDto;
 import umc.spring.post.data.dto.UserJoinDto;
 import umc.spring.post.data.dto.UserLoginDto;
 import umc.spring.post.service.AuthService;
+
+import javax.management.AttributeNotFoundException;
 
 @RestController
 @RequestMapping("/user")
@@ -30,7 +36,13 @@ public class AuthController {
     }
 
     @GetMapping("/info")
+    @ResponseStatus(HttpStatus.OK)
     public UserInfoDto info() {
-        return authService.info();
+        try{
+            return authService.info();
+        }
+        catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not Found");
+        }
     }
 }

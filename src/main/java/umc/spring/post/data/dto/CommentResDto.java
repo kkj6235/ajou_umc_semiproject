@@ -17,6 +17,7 @@ public class CommentResDto {
     private String author;
     private String text;
     private Date timestamp;
+
     public static CommentResDto toDTO(Comment comment){
 
         return CommentResDto.builder()

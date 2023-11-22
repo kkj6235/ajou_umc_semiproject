@@ -1,11 +1,7 @@
 package umc.spring.post.service;
 
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import umc.spring.post.config.security.SecurityUtil;
 import umc.spring.post.data.dto.CommentDto;
@@ -14,12 +10,14 @@ import umc.spring.post.data.dto.PostResDto;
 import umc.spring.post.data.dto.UserInfoDto;
 import umc.spring.post.data.entity.Comment;
 import umc.spring.post.data.entity.Post;
+import umc.spring.post.data.entity.User;
 import umc.spring.post.repository.CommentRepository;
 import umc.spring.post.repository.PostRepository;
 import umc.spring.post.repository.UserRepository;
 
-import java.io.IOException;
 import java.util.*;
+
+import static umc.spring.post.config.security.SecurityUtil.getCurrentMemberId;
 
 @Service
 public class PostServiceImpl implements PostService{
@@ -30,22 +28,30 @@ public class PostServiceImpl implements PostService{
     @Autowired
     private final CommentRepository commentRepository;
 
-    public PostServiceImpl(PostRepository postRepository, CommentRepository commentRepository) {
+    @Autowired
+    private final UserRepository userRepository;
+
+    public PostServiceImpl(PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public void upload(PostDto postDto){
-        UserInfoDto userInfoDto = SecurityUtil.getCurrentMemberId();
+
+        UserInfoDto userInfoDto = getCurrentMemberId();
 
         Post post = new Post();
         setPost(postDto, post);
-        post.setUserId(postDto.getUserId());
+        post.setAuthor(userInfoDto.getUserName());
+        post.setUserId(userInfoDto.getUserId());
         post.setCreatedTime((new Date()));
         post.setModifiedTime(post.getCreatedTime());
+
         postRepository.save(post);
     }
+
 
     @Override
     public List<PostResDto> getAllPost(){
@@ -67,6 +73,8 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void likeCrew(Long id) {
+        UserInfoDto userInfoDto = getCurrentMemberId();
+
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         int likeCount = post.getLikeCount();
         post.setLikeCount(++likeCount);
@@ -80,7 +88,6 @@ public class PostServiceImpl implements PostService{
         if(likeCount!=0){
             post.setLikeCount(--likeCount);
             postRepository.save(post);
-
         }
     }
 
@@ -150,6 +157,8 @@ public class PostServiceImpl implements PostService{
 
         post.getComments().add(comment);
         comment.setPost(post);
+        post.setAuthor(userInfoDto.getUserName());
+
         comment.setUserId(commentDto.getUserId());
         comment.setTimestamp(new Date());
         comment.setText(commentDto.getText());
@@ -161,7 +170,6 @@ public class PostServiceImpl implements PostService{
     private static void setPost(PostDto postDto, Post post) {
         post.setTitle(postDto.getTitle());
         post.setBody(postDto.getBody());
-        post.setAuthor(postDto.getAuthor());
         post.setLikeCount(postDto.getLikeCount());
         post.setImage(postDto.getImage());
     }
