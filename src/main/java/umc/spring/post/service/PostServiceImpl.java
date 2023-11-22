@@ -40,9 +40,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void upload(PostDto postDto){
-
         UserInfoDto userInfoDto = getCurrentMemberId();
-
         Post post = new Post();
         setPost(postDto, post);
         post.setAuthor(userInfoDto.getUserName());
@@ -197,10 +195,9 @@ public class PostServiceImpl implements PostService{
         Comment comment = new Comment();
         Post post = postRepository.findById(commentDto.getPostId()).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         post.getComments().add(comment);
-        comment.setPost(post);
-        post.setAuthor(userInfoDto.getUserName());
-
-        comment.setUserId(commentDto.getUserId());
+        comment.setPostId(commentDto.getPostId());
+        comment.setAuthor(commentDto.getAuthor());
+        comment.setText(commentDto.getText());
         comment.setTimestamp(new Date());
         return comment;
 
