@@ -3,6 +3,8 @@ package umc.spring.post.data.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import umc.spring.file.domain.S3File;
+import umc.spring.file.domain.S3FileDto;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,9 +30,6 @@ public class Post{
     private String body;
 
     @Column(nullable = false)
-    private String image;
-
-    @Column(nullable = false)
     private int likeCount;
 
     @Column(nullable = false)
@@ -42,6 +41,9 @@ public class Post{
     @Column(nullable = true)
     private Date modifiedTime;
 
+    @Embedded
+    private S3File s3File;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,fetch = FetchType.EAGER,
             orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
@@ -49,7 +51,5 @@ public class Post{
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL,fetch = FetchType.EAGER,
             orphanRemoval = true)
     private List<LikeData> likes = new ArrayList<>();
-
-
 
 }

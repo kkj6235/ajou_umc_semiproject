@@ -112,7 +112,7 @@ public class PostServiceImpl implements PostService{
             if(Objects.equals(post.getUserId(), userInfoDto.getUserId())){
                 post.setTitle(postDto.getTitle() != null ? postDto.getTitle() : post.getTitle());
                 post.setBody(postDto.getBody() != null ? postDto.getBody() : post.getBody());
-                post.setImage(postDto.getImage() != null ? postDto.getImage() : post.getImage());
+                post.setS3File(postDto.getS3File() != null ? postDto.getS3File() : post.getS3File());
                 post.setModifiedTime(new Date());
                 postRepository.save(post);
                 return true;
@@ -233,6 +233,6 @@ public class PostServiceImpl implements PostService{
         post.setTitle(postDto.getTitle());
         post.setBody(postDto.getBody());
         post.setLikeCount(0);
-        post.setImage(postDto.getImage());
+        post.setS3File(postDto.getS3File());
     }
 }
