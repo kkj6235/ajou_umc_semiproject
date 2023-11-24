@@ -19,13 +19,13 @@ import java.util.List;
 @RequestMapping("/api/file")
 public class FileController {
 
-    private final AmazonS3Service amazon3SService;
+    private final AmazonS3Service amazonS3Service;
 
     @PostMapping("/uploads")
     public List<S3FileDto> uploadFiles(
             @RequestParam(value = "uploadFilePath") String uploadFilePath,
             @RequestPart(value = "files") List<MultipartFile> multipartFiles) {
-        return amazon3SService.uploadFiles(uploadFilePath, multipartFiles);
+        return amazonS3Service.uploadFiles(uploadFilePath, multipartFiles);
     }
 
     @DeleteMapping("/delete")
@@ -34,7 +34,7 @@ public class FileController {
             @RequestParam(value = "uuidFileName") String uuidFileName) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(amazon3SService.deleteFile(uploadFilePath, uuidFileName));
+                .body(amazonS3Service.deleteFile(uploadFilePath, uuidFileName));
     }
 
     @GetMapping("/get")
@@ -42,7 +42,7 @@ public class FileController {
                         @RequestParam String uploadFilePath,
                         @RequestParam String uuidFileName) {
         try {
-            InputStream inputStream = amazon3SService.getFile(uploadFilePath, uuidFileName);
+            InputStream inputStream = amazonS3Service.getFile(uploadFilePath, uuidFileName);
             if (inputStream != null) {
                 byte[] buffer = new byte[4048];
                 int bytesRead;

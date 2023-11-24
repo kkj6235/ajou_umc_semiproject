@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import umc.spring.file.domain.S3File;
+import umc.spring.file.domain.S3FileDto;
+import umc.spring.file.service.AmazonS3Service;
 import umc.spring.post.data.dto.CommentDto;
 import umc.spring.post.data.dto.PostDto;
 import umc.spring.post.data.dto.PostResDto;
@@ -30,6 +33,9 @@ public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
 
     @Autowired
+    private final AmazonS3Service amazonS3Service;
+
+    @Autowired
     private final CommentRepository commentRepository;
 
     @Autowired
@@ -37,8 +43,9 @@ public class PostServiceImpl implements PostService{
     @Autowired
     private final LikeRepository likeRepository;
 
-    public PostServiceImpl(PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository, LikeRepository likeRepository) {
+    public PostServiceImpl(PostRepository postRepository, AmazonS3Service amazonS3Service, CommentRepository commentRepository, UserRepository userRepository, LikeRepository likeRepository) {
         this.postRepository = postRepository;
+        this.amazonS3Service = amazonS3Service;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
@@ -89,6 +96,8 @@ public class PostServiceImpl implements PostService{
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not found");
             }
             if(Objects.equals(byId.get().getUserId(), userInfoDto.getUserId())){
+                S3File s3File = byId.get().getS3File();
+                amazonS3Service.deleteFile(s3File.getUploadFilePath(), s3File.getUploadFileName());
                 postRepository.deleteById(id);
                 return true;
             }
