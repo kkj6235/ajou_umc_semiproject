@@ -27,9 +27,9 @@ public class PostController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/post/upload")
-    public void upload(@RequestBody PostDto postDto){
+    public PostResDto upload(@RequestBody PostDto postDto){
         try{
-            postService.upload(postDto);
+            return postService.upload(postDto);
         }
         catch(Exception e){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not Found");
@@ -63,6 +63,7 @@ public class PostController {
             postService.likeCrew(id);
         }
         catch (Exception e){
+            System.out.println("여기");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not found");
         }
     }

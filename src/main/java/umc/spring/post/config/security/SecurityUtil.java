@@ -17,7 +17,6 @@ public class SecurityUtil {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || authentication.getName() == null) {
-            System.out.println("2번");
             throw new RuntimeException("No authentication information.");
         }
         MyUser myUser = (MyUser) authentication.getPrincipal();

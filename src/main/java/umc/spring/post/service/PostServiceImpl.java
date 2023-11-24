@@ -1,6 +1,7 @@
 package umc.spring.post.service;
 
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public void upload(PostDto postDto){
+    public PostResDto upload(PostDto postDto){
         UserInfoDto userInfoDto = getCurrentMemberId();
         Post post = new Post();
         setPost(postDto, post);
@@ -54,6 +55,7 @@ public class PostServiceImpl implements PostService{
         post.setModifiedTime(post.getCreatedTime());
 
         postRepository.save(post);
+        return PostResDto.toDTO(post);
     }
 
 
@@ -125,7 +127,6 @@ public class PostServiceImpl implements PostService{
     @Override
     public void likeCrew(Long id) {
         UserInfoDto userInfoDto = getCurrentMemberId();
-        // 내가 좋아요를 누른적이 있는지? 있으면 반영안됨
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         User user = userRepository.findByLoginId(userInfoDto.getLoginId()).orElseThrow();
         Optional<LikeData> byPostAndUser = likeRepository.findByPostAndUser(post, user);
@@ -162,7 +163,6 @@ public class PostServiceImpl implements PostService{
         else{
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "좋아요를 누른 적이 없습니다");
         }
-
     }
 
     @Override

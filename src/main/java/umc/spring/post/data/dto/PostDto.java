@@ -9,6 +9,5 @@ import umc.spring.file.domain.S3File;
 public class PostDto {
     String title;
     String body;
-    int likeCount;
     S3File s3File;
 }
