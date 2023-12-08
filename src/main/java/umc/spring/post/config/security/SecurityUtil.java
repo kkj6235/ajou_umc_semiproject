@@ -1,15 +1,10 @@
 package umc.spring.post.config.security;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import umc.spring.post.data.dto.UserInfoDto;
-import umc.spring.post.data.entity.User;
-import umc.spring.post.repository.UserRepository;
 
-import java.util.Objects;
 
 public class SecurityUtil {
 

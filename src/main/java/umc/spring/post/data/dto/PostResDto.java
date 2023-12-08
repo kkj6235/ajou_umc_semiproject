@@ -32,11 +32,13 @@ public class PostResDto {
 
     public static PostResDto toDTO(Post post){
         List<CommentResDto> resDtos = new ArrayList<>();
+
         post.getComments().forEach(comment -> {
             CommentResDto dto = CommentResDto.toDTO(comment);
             resDtos.add(dto);
         });
         UserInfoDto userInfoDto;
+
         boolean flag=false;
 
         try {

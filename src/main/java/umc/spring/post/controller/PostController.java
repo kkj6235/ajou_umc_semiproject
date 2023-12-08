@@ -58,15 +58,14 @@ public class PostController {
     @PostMapping("/post/likes")
     @ResponseStatus(HttpStatus.OK)
     public void likeCrew(@RequestParam Long id){
-
         try {
             postService.likeCrew(id);
         }
         catch (Exception e){
-            System.out.println("여기");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not found");
         }
     }
+
     @DeleteMapping ("/post/likes")
     @ResponseStatus(HttpStatus.OK)
     public void dislikeCrew(@RequestParam Long id){

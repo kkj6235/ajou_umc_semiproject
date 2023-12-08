@@ -30,9 +30,6 @@ public class Post{
     private String body;
 
     @Column(nullable = false)
-    private int likeCount;
-
-    @Column(nullable = false)
     private String author;
 
     @Column(nullable = true)

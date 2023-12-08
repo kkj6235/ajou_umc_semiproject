@@ -53,6 +53,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public PostResDto upload(PostDto postDto){
+
         UserInfoDto userInfoDto = getCurrentMemberId();
         Post post = new Post();
         setPost(postDto, post);
@@ -89,6 +90,7 @@ public class PostServiceImpl implements PostService{
         Optional<Post> byId = postRepository.findById(id);
         if(byId.isPresent()){
             UserInfoDto userInfoDto;
+            Post post = byId.get();
             try {
                 userInfoDto = getCurrentMemberId();
             }
@@ -96,8 +98,6 @@ public class PostServiceImpl implements PostService{
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not found");
             }
             if(Objects.equals(byId.get().getUserId(), userInfoDto.getUserId())){
-                S3File s3File = byId.get().getS3File();
-                amazonS3Service.deleteFile(s3File.getUploadFilePath(), s3File.getUploadFileName());
                 postRepository.deleteById(id);
                 return true;
             }
@@ -136,13 +136,15 @@ public class PostServiceImpl implements PostService{
     @Override
     public void likeCrew(Long id) {
         UserInfoDto userInfoDto = getCurrentMemberId();
+
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
+
         User user = userRepository.findByLoginId(userInfoDto.getLoginId()).orElseThrow();
+
         Optional<LikeData> byPostAndUser = likeRepository.findByPostAndUser(post, user);
         if(byPostAndUser.isEmpty()){
             LikeData likeData = new LikeData();
             post.getLikes().add(likeData);
-            user.getLikes().add(likeData);
             likeData.setUser(user);
             likeData.setPost(post);
             likeRepository.save(likeData);
@@ -158,16 +160,15 @@ public class PostServiceImpl implements PostService{
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         User user = userRepository.findByLoginId(userInfoDto.getLoginId()).orElseThrow();
         Optional<LikeData> byPostAndUser = likeRepository.findByPostAndUser(post, user);
-        if(byPostAndUser.isPresent()){
-            post.getLikes().removeIf(data ->
-                    data.getPost().equals(post)
-            );
-            postRepository.save(post);
 
-            user.getLikes().removeIf(data ->
+        if(byPostAndUser.isPresent()){
+
+            post.getLikes().removeIf(data ->
                     data.getUser().equals(user)
             );
-            userRepository.save(user);
+
+            postRepository.save(post);
+
         }
         else{
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "좋아요를 누른 적이 없습니다");
@@ -189,10 +190,11 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void addComment(CommentDto commentDto){
-        // 토큰 받은 유저가 우리 회원인지
-
+        // 토큰 받은 유저가 게시글 회원인지가 아니라!!! 우리 회원인지확인..
         UserInfoDto userInfoDto = getCurrentMemberId();
+        System.out.println("통과");
         Comment comment = setComment(commentDto);
+        comment.setAuthor(userInfoDto.getUserName());
         comment.setUserId(userInfoDto.getUserId());
         commentRepository.save(comment);
     }
@@ -208,6 +210,7 @@ public class PostServiceImpl implements PostService{
             catch(Exception e){
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not found");
             }
+
             Comment comment = option.get();
             if(Objects.equals(userInfoDto.getUserId(), comment.getUserId())){
                 Post post = comment.getPost();
@@ -217,6 +220,7 @@ public class PostServiceImpl implements PostService{
                     );
                     postRepository.save(post);
                 }
+
                 return true;
             }
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized: You do not have permission to delete this comment.");
@@ -230,8 +234,8 @@ public class PostServiceImpl implements PostService{
         Comment comment = new Comment();
         Post post = postRepository.findById(commentDto.getPostId()).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         post.getComments().add(comment);
+
         comment.setPostId(commentDto.getPostId());
-        comment.setAuthor(commentDto.getAuthor());
         comment.setText(commentDto.getText());
         comment.setTimestamp(new Date());
         return comment;
@@ -241,7 +245,6 @@ public class PostServiceImpl implements PostService{
     private static void setPost(PostDto postDto, Post post) {
         post.setTitle(postDto.getTitle());
         post.setBody(postDto.getBody());
-        post.setLikeCount(0);
         post.setS3File(postDto.getS3File());
     }
 }
