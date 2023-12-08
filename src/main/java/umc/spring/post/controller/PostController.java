@@ -74,7 +74,13 @@ public class PostController {
     @PostMapping("/post/comments")
     @ResponseStatus(HttpStatus.OK)
     public void addComment(@RequestBody CommentDto commentDto){
-        postService.addComment(commentDto);
+        try{
+            postService.addComment(commentDto);
+        }
+        catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not found");
+
+        }
     }
 
     @DeleteMapping("/post/comments")
