@@ -3,8 +3,6 @@ package umc.spring.post.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import umc.spring.post.data.dto.CommentDto;
@@ -42,7 +40,8 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public void upload(PostDto postDto){
-        UserInfoDto userInfoDto = SecurityUtil.getCurrentMemberId();
+
+        UserInfoDto userInfoDto = getCurrentMemberId();
 
         Post post = new Post();
         setPost(postDto, post);
@@ -199,6 +198,8 @@ public class PostServiceImpl implements PostService{
         Post post = postRepository.findById(commentDto.getPostId()).orElseThrow(() -> new RuntimeException("id가 존재하지 않습니다."));
         post.getComments().add(comment);
         comment.setPost(post);
+        post.setAuthor(userInfoDto.getUserName());
+
         comment.setUserId(commentDto.getUserId());
         comment.setTimestamp(new Date());
         return comment;
