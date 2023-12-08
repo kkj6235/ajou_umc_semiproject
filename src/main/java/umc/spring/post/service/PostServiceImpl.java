@@ -98,6 +98,8 @@ public class PostServiceImpl implements PostService{
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not found");
             }
             if(Objects.equals(byId.get().getUserId(), userInfoDto.getUserId())){
+                S3File s3File = byId.get().getS3File();
+                amazonS3Service.deleteFile(s3File.getUploadFilePath(), s3File.getUploadFileName());
                 postRepository.deleteById(id);
                 return true;
             }
